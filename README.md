@@ -8,6 +8,9 @@ Python + python-vlc 기반 CLI 비디오 플레이어.
 # VLC 및 python 바인딩
 sudo apt install vlc
 sudo apt install python3-vlc
+
+# 화면 채우기(--fill) 기능 사용 시 tkinter 필요
+sudo apt install python3-tk
 ```
 
 ## 설치
@@ -77,43 +80,6 @@ python3 player.py video.mp4 --deinterlace yadif2x
 # 조합
 python3 player.py video.mp4 --fill crop --deinterlace yadif2x
 ```
-
-## Docker 환경에서 실행
-
-컨테이너 내부에서 실행 시 X11 디스플레이 접근 권한이 필요하다.
-
-### 방법 1: xhost (간단)
-
-**1. 호스트에서 root 접근 허용 (한 번만)**
-
-```bash
-xhost +local:root
-```
-
-**2. 컨테이너 내부에서 DISPLAY 설정 후 실행**
-
-```bash
-export DISPLAY=:0
-python3 player.py video.mp4
-```
-
-### 방법 2: .Xauthority 복사
-
-**1. 호스트에서 인증 파일 복사**
-
-```bash
-docker cp /home/james/.Xauthority ros1-main:/root/.Xauthority
-```
-
-**2. 컨테이너 내부에서 설정 후 실행**
-
-```bash
-export DISPLAY=:0
-export XAUTHORITY=/root/.Xauthority
-python3 player.py video.mp4
-```
-
-> 컨테이너 실행 시 `/tmp/.X11-unix:/tmp/.X11-unix` 가 마운트되어 있어야 한다.
 
 ## 실행 화면
 

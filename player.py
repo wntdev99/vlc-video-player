@@ -12,6 +12,7 @@ Ubuntu Python 비디오 플레이어 (python-vlc 기반)
     python player.py video.mp4 --fill stretch
     python player.py video.mp4 --fill crop
     python player.py video.mp4 --deinterlace yadif2x
+    python player.py video.mp4 --show-cursor
 """
 
 import sys
@@ -21,13 +22,14 @@ import vlc
 
 
 class VideoPlayer:
-    def __init__(self, filepath: str, fullscreen: bool = True, fill_mode: str = None, deinterlace: str = None):
+    def __init__(self, filepath: str, fullscreen: bool = True, fill_mode: str = None, deinterlace: str = None, show_cursor: bool = False):
         self.filepath = filepath
         self.fullscreen = fullscreen
         self.fill_mode = fill_mode      # None | "stretch" | "crop"
         self.deinterlace = deinterlace  # None | "blend" | "bob" | "discard" | "linear" | "mean" | "x" | "yadif" | "yadif2x"
 
-        self.instance = vlc.Instance()
+        instance_args = [] if show_cursor else ['--mouse-hide-timeout=0']
+        self.instance = vlc.Instance(instance_args)
         self.media = self.instance.media_new(filepath)
         self.media.parse()  # 메타데이터 파싱 (duration 등)
 
@@ -39,13 +41,14 @@ class VideoPlayer:
 
     @staticmethod
     def _get_screen_size() -> tuple:
-        """xrandr로 스크린 해상도 감지"""
-        import subprocess, re
-        result = subprocess.run(["xrandr"], capture_output=True, text=True)
-        m = re.search(r"current (\d+) x (\d+)", result.stdout)
-        if m:
-            return int(m.group(1)), int(m.group(2))
-        raise RuntimeError("화면 해상도를 감지할 수 없습니다. xrandr 출력을 확인하세요.")
+        """tkinter로 스크린 해상도 감지"""
+        import tkinter as tk
+        root = tk.Tk()
+        root.withdraw()
+        w = root.winfo_screenwidth()
+        h = root.winfo_screenheight()
+        root.destroy()
+        return w, h
 
     def _apply_fill(self):
         if not self.fill_mode:
@@ -201,9 +204,16 @@ def main():
         default=None,
         help="디인터레이싱 모드 (고품질: yadif2x, 경량: linear)",
     )
+    parser.add_argument(
+        "--show-cursor",
+        dest="show_cursor",
+        action="store_true",
+        default=False,
+        help="재생 중 마우스 커서 표시 (기본값: 숨김)",
+    )
     args = parser.parse_args()
 
-    player = VideoPlayer(args.video, fullscreen=args.fullscreen, fill_mode=args.fill, deinterlace=args.deinterlace)
+    player = VideoPlayer(args.video, fullscreen=args.fullscreen, fill_mode=args.fill, deinterlace=args.deinterlace, show_cursor=args.show_cursor)
 
     # 영상 기본 정보 출력
     info = player.get_info()
