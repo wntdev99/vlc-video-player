@@ -39,14 +39,13 @@ class VideoPlayer:
 
     @staticmethod
     def _get_screen_size() -> tuple:
-        """tkinter로 스크린 해상도 감지"""
-        import tkinter as tk
-        root = tk.Tk()
-        root.withdraw()
-        w = root.winfo_screenwidth()
-        h = root.winfo_screenheight()
-        root.destroy()
-        return w, h
+        """xrandr로 스크린 해상도 감지"""
+        import subprocess, re
+        result = subprocess.run(["xrandr"], capture_output=True, text=True)
+        m = re.search(r"current (\d+) x (\d+)", result.stdout)
+        if m:
+            return int(m.group(1)), int(m.group(2))
+        raise RuntimeError("화면 해상도를 감지할 수 없습니다. xrandr 출력을 확인하세요.")
 
     def _apply_fill(self):
         if not self.fill_mode:
