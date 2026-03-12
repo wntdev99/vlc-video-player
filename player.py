@@ -3,7 +3,7 @@ Ubuntu Python 비디오 플레이어 (python-vlc 기반)
 
 설치:
     sudo apt install vlc
-    pip install python-vlc
+    sudo apt install python3-vlc
 
 사용법:
     python player.py video.mp4

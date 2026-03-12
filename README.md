@@ -7,7 +7,7 @@ Python + python-vlc 기반 CLI 비디오 플레이어.
 ```bash
 # VLC 및 python 바인딩
 sudo apt install vlc
-pip install python-vlc
+sudo apt install python3-vlc
 
 # 화면 채우기(--fill) 기능 사용 시 tkinter 필요
 sudo apt install python3-tk
